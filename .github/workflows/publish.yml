@@ -1,0 +1,17 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Publish crate
+        run: cargo publish --token ${{ secrets.CRATES_TOKEN }}

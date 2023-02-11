@@ -1,0 +1,23 @@
+[package]
+name = "serde-inline-default"
+version = "0.1.0"
+authors = ["ByteDream"]
+edition = "2021"
+description = "Serde default values via inline declaration"
+readme = "README.md"
+repository = "https://github.com/ByteDream/serde-inline-default"
+license = "MIT OR Apache-2.0"
+keywords = ["serde", "serialization"]
+categories = ["encoding"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0", features = ["full"] }
+
+[dev-dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
