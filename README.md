@@ -4,7 +4,7 @@ Tiny crate to set default values for serde fields via inline attribute declarati
 
 ## Overview
 
-This crate is an approach to do what serde-rs/serde#368 purposes.
+This crate is an approach to do what [serde-rs/serde#368](https://github.com/serde-rs/serde/issues/368) purposes.
 If you want to set default values in plain [`serde`](https://serde.rs/), you have to create a function and link to it with `#[serde(default = "...")`.
 This may be good if you need to do calculations to get the default value, but often you just want a simple integer or string to be the default value and have to create a whole function to return a hard-coded value.
 ```rust
