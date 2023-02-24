@@ -17,6 +17,8 @@ fn test_serde_inline_default() {
         inline: u32,
         #[serde_inline_default(-1337)]
         inline_negative: i32,
+        #[serde_inline_default("string".to_string())]
+        string: String,
     }
 
     let test: Test = serde_json::from_value(json!({})).unwrap();
@@ -24,4 +26,5 @@ fn test_serde_inline_default() {
     assert_eq!(test.native, 69);
     assert_eq!(test.inline, 420);
     assert_eq!(test.inline_negative, -1337);
+    assert_eq!(test.string, "string".to_string());
 }
