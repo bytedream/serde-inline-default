@@ -27,6 +27,7 @@ pub(crate) fn expand_struct(mut item: ItemStruct) -> proc_macro::TokenStream {
 
                 let inline_fn = quote! {
                     #[doc(hidden)]
+                    #[allow(non_snake_case)]
                     fn #fn_name_ident () -> #return_type {
                         #default
                     }
