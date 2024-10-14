@@ -1,3 +1,4 @@
+use crate::utils::type_lifetimes_to_static;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use syn::{parse_quote, ItemStruct};
@@ -23,7 +24,10 @@ pub(crate) fn expand_struct(mut item: ItemStruct) -> proc_macro::TokenStream {
             } else {
                 let fn_name_lit = format!("__serde_inline_default_{}_{}", item.ident, i);
                 let fn_name_ident = Ident::new(&fn_name_lit, Span::call_site());
-                let return_type = &field.ty;
+                let mut return_type = field.ty.clone();
+
+                // replaces most lifetimes with 'static
+                type_lifetimes_to_static(&mut return_type);
 
                 let inline_fn = quote! {
                     #[doc(hidden)]

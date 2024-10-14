@@ -4,6 +4,7 @@ use proc_macro::TokenStream;
 use syn::{parse_macro_input, Item};
 
 mod expand;
+mod utils;
 
 /// The main macro of this crate.
 /// Use it to define default values of fields in structs you [`Serialize`] or [`Deserialize`].

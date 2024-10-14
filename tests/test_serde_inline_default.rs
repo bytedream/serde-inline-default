@@ -1,6 +1,7 @@
 use serde::Deserialize;
 use serde_inline_default::serde_inline_default;
 use serde_json::json;
+use std::borrow::Cow;
 
 #[test]
 fn test_serde_inline_default() {
@@ -27,4 +28,18 @@ fn test_serde_inline_default() {
     assert_eq!(test.inline, 420);
     assert_eq!(test.inline_negative, -1337);
     assert_eq!(test.string, "string".to_string());
+}
+
+#[test]
+fn test_lifetime() {
+    #[serde_inline_default]
+    #[derive(Deserialize)]
+    struct LifetimeTest<'a> {
+        #[serde_inline_default("test".into())]
+        test_str: Cow<'a, str>,
+    }
+
+    let lifetime_test: LifetimeTest = serde_json::from_value(json!({})).unwrap();
+
+    assert_eq!(lifetime_test.test_str, "test");
 }
