@@ -4,7 +4,7 @@ use quote::quote;
 use syn::{parse_quote, ItemStruct};
 
 pub(crate) fn expand_struct(mut item: ItemStruct) -> proc_macro::TokenStream {
-    let mut inline_fns: Vec<(String, TokenStream, TokenStream)> = vec![];
+    let mut inline_fns: Vec<TokenStream> = vec![];
 
     for (i, field) in item.fields.iter_mut().enumerate() {
         for (j, attr) in field.attrs.iter_mut().enumerate() {
@@ -14,31 +14,21 @@ pub(crate) fn expand_struct(mut item: ItemStruct) -> proc_macro::TokenStream {
 
             let default: TokenStream = attr.parse_args().unwrap();
 
-            // we check here if a function with the exact same return value already exists. if so,
-            // this function gets used.
-            let fn_name_lit = if let Some((fn_name_lit, _, _)) = inline_fns
-                .iter()
-                .find(|(_, def, _)| def.to_string() == default.to_string())
-            {
-                fn_name_lit.clone()
-            } else {
-                let fn_name_lit = format!("__serde_inline_default_{}_{}", item.ident, i);
-                let fn_name_ident = Ident::new(&fn_name_lit, Span::call_site());
-                let mut return_type = field.ty.clone();
+            let fn_name_lit = format!("__serde_inline_default_{}_{}", item.ident, i);
+            let fn_name_ident = Ident::new(&fn_name_lit, Span::call_site());
+            let mut return_type = field.ty.clone();
 
-                // replaces most lifetimes with 'static
-                type_lifetimes_to_static(&mut return_type);
+            // replaces most lifetimes with 'static
+            type_lifetimes_to_static(&mut return_type);
 
-                let inline_fn = quote! {
-                    #[doc(hidden)]
-                    #[allow(non_snake_case)]
-                    fn #fn_name_ident () -> #return_type {
-                        #default
-                    }
-                };
-                inline_fns.push((fn_name_lit.clone(), default, inline_fn));
-                fn_name_lit
-            };
+            inline_fns.push(quote! {
+                #[doc(hidden)]
+                #[allow(non_snake_case)]
+                fn #fn_name_ident () -> #return_type {
+                    #default
+                }
+            });
+
             field.attrs.remove(j);
             field
                 .attrs
@@ -47,10 +37,8 @@ pub(crate) fn expand_struct(mut item: ItemStruct) -> proc_macro::TokenStream {
         }
     }
 
-    let real_inline_fns: Vec<TokenStream> =
-        inline_fns.into_iter().map(|(_, _, func)| func).collect();
     let expanded = quote! {
-        #( #real_inline_fns )*
+        #( #inline_fns )*
 
         #item
     };
