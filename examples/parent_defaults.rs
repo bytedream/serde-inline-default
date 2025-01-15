@@ -9,13 +9,17 @@ struct A {
     /// like this: `A::default().value`
     #[serde_inline_default_parent()]
     value: String,
+
+    /// In contrast, this uses the field type's default implementation:
+    #[serde(default)]
+    another_value: String,
 }
 
-const DEFAULT_STRING_VALUE: &str = "my cool default";
 impl Default for A {
     fn default() -> Self {
         Self {
-            value: DEFAULT_STRING_VALUE.into(),
+            value: "my cool default".into(),
+            another_value: "another default string".to_string(),
         }
     }
 }
@@ -23,6 +27,7 @@ impl Default for A {
 fn main() -> Result<(), serde_json::Error> {
     let json_object = json!({});
     let basic: A = serde_json::from_value(json_object)?;
-    assert_eq!(basic.value, DEFAULT_STRING_VALUE);
+    assert_eq!(basic.value, "my cool default");
+    assert_eq!(basic.another_value, "");
     Ok(())
 }
