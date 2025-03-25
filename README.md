@@ -1,4 +1,4 @@
-# serde-inline-default [![ci](https://github.com/ByteDream/serde-inline-default/actions/workflows/ci.yml/badge.svg)](https://github.com/ByteDream/serde-inline-default/actions/workflows/ci.yml) [![crates.io](https://img.shields.io/crates/v/serde-inline-default)](https://crates.io/crates/serde-inline-default) [![docs](https://img.shields.io/docsrs/serde-inline-default)](https://docs.rs/serde-inline-default/latest/serde_inline_default/)
+# serde-inline-default [![ci](https://github.com/ByteDream/serde-inline-default/actions/workflows/ci.yml/badge.svg)](https://github.com/ByteDream/serde-inline-default/actions/workflows/ci.yml) [![crates.io](https://img.shields.io/crates/v/serde-inline-default)](https://crates.io/crates/serde-inline-default) [![crates.io downloads](https://img.shields.io/crates/d/serde-inline-default)](https://crates.io/crates/serde-inline-default) [![docs](https://img.shields.io/docsrs/serde-inline-default)](https://docs.rs/serde-inline-default/latest/serde_inline_default/)
 
 Tiny crate to set default values for serde fields via inline attribute declaration.
 
