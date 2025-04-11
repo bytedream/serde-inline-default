@@ -15,6 +15,9 @@ struct Test {
 }
 
 fn value_default() -> u32 { 42 }
+
+// let test: Test = serde_json::from_value(json!({})).unwrap();
+// -> Test { value: 42 }
 ```
 
 That can get quiet messy if you have many fields with many (different) default values.
@@ -28,10 +31,61 @@ struct Test {
     #[serde_inline_default(42)]
     value: u32
 }
+
+// let test: Test = serde_json::from_value(json!({})).unwrap();
+// -> Test { value: 42 }
 ```
 
 Internally, `#[serde_inline_default(...)]` gets expanded to a function which returns the set value and the attribute is replaced with `#[serde(default = "<function name>")]`.
 So this macro is just some syntax sugar for you, but can get quiet handy if you want to keep your code clean or write declarative macros / `macro_rules!`.
+
+## Alternatives
+
+This crate isn't perfect. Thus, you might be more satisfied with alternatives `serde` provides.
+
+With `#[serde(default)]` + `impl Default` on a struct, `serde` uses the default implementation of the struct to get default values for each field ([docs](https://serde.rs/container-attrs.html#default)):
+```rust
+#[derive(Deserialize)]
+#[serde(default)]
+struct Test {
+    value: u32
+}
+
+impl Default for Test {
+    fn default() -> Self {
+        Self {
+            value: 42
+        }
+    }
+}
+
+// let test: Test = serde_json::from_value(json!({})).unwrap();
+// -> Test { value: 42 }
+```
+
+If you still need/want `serde-inline-default` features, you also can combine them with `#[serde(default))` and `impl Default`:
+```rust
+#[serde_inline_default]
+#[derive(Deserialize)]
+#[serde(default)]
+struct Test {
+    value: u32,
+    #[serde_inline_default(0)]
+    other_value: u32,
+}
+
+impl Default for Test {
+    fn default() -> Self {
+        Self {
+            value: 42,
+            other_value: 42
+        }
+    }
+}
+
+// let test: Test = serde_json::from_value(json!({})).unwrap();
+// -> Test { value: 42, other_value: 0 }
+```
 
 ## License
 
