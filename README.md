@@ -15,9 +15,6 @@ struct Test {
 }
 
 fn value_default() -> u32 { 42 }
-
-// let test: Test = serde_json::from_value(json!({})).unwrap();
-// -> Test { value: 42 }
 ```
 
 That can get quiet messy if you have many fields with many (different) default values.
@@ -31,9 +28,6 @@ struct Test {
     #[serde_inline_default(42)]
     value: u32
 }
-
-// let test: Test = serde_json::from_value(json!({})).unwrap();
-// -> Test { value: 42 }
 ```
 
 Internally, `#[serde_inline_default(...)]` gets expanded to a function which returns the set value and the attribute is replaced with `#[serde(default = "<function name>")]`.
@@ -58,9 +52,6 @@ impl Default for Test {
         }
     }
 }
-
-// let test: Test = serde_json::from_value(json!({})).unwrap();
-// -> Test { value: 42 }
 ```
 
 If you still need/want `serde-inline-default` features, you also can combine them with `#[serde(default))` and `impl Default`:
@@ -82,9 +73,6 @@ impl Default for Test {
         }
     }
 }
-
-// let test: Test = serde_json::from_value(json!({})).unwrap();
-// -> Test { value: 42, other_value: 0 }
 ```
 
 ## License
