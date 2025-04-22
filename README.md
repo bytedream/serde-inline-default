@@ -19,7 +19,7 @@ fn value_default() -> u32 { 42 }
 
 That can get quiet messy if you have many fields with many (different) default values.
 This crate tries to solve this issue by providing the `#[serde_inline_default]` proc macro.
-With this macro set at the struct level (_**before `#[derive(Deserialize)]`/`#[derive(Serialize)]`!, otherwise it's not working correctly**_), you can set default values via `#[serde_inline_default(...)]` for your serde fields inline, without creating an extra function.
+With this macro set at the struct level, you can set default values via `#[serde_inline_default(...)]` for your serde fields inline, without creating an extra function.
 
 ```rust
 #[serde_inline_default]
@@ -29,6 +29,9 @@ struct Test {
     value: u32
 }
 ```
+
+> [!IMPORTANT]
+> **`#[serde_inline_default]` must be set before `#[derive(Deserialize)]`/`#[derive(Serialize)]`, otherwise it's not working correctly!**
 
 Internally, `#[serde_inline_default(...)]` gets expanded to a function which returns the set value and the attribute is replaced with `#[serde(default = "<function name>")]`.
 So this macro is just some syntax sugar for you, but can get quiet handy if you want to keep your code clean or write declarative macros / `macro_rules!`.
