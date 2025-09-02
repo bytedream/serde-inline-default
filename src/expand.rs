@@ -14,15 +14,19 @@ pub(crate) fn expand_struct(mut item: ItemStruct) -> proc_macro::TokenStream {
 
             let default: TokenStream = attr.parse_args().unwrap();
 
-            // copy all the same #[cfg] conditional compilations flags for the field onto our built "constructor"
-            // otherwise, it's possible to create a constructor for a type that may be filtered by the same #[cfg]'s, breaking compilation
+            // copy all the same #[cfg] conditional compilations flags for the field onto our built
+            // default function.
+            // otherwise, it's possible to create a constructor for a type that may be filtered by
+            // the same #[cfg]'s, breaking compilation
             let cfg_attrs = field.attrs.iter().filter(|a| a.path().is_ident("cfg"));
 
             let fn_name_lit = format!("__serde_inline_default_{}_{}", item.ident, i);
             let fn_name_ident = Ident::new(&fn_name_lit, Span::call_site());
             let mut return_type = field.ty.clone();
 
-            // replaces most lifetimes with 'static
+            // replace lifetimes with 'static.
+            // the built default function / default values in general can only be static as they're
+            // generated without reference to the parent struct
             type_lifetimes_to_static(&mut return_type);
 
             inline_fns.push(quote! {

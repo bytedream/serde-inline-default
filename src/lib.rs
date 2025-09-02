@@ -8,12 +8,15 @@ mod utils;
 
 /// The main macro of this crate.
 /// Use it to define default values of fields in structs you [`Serialize`] or [`Deserialize`].
-/// You do not need to create a extra function to provide the default value, as it is the case in serdes' implementation of default (`#[serde(default = "...")]`).
+/// You do not need to create an extra function to provide the default value, as it is the case in
+/// serdes' implementation of default (`#[serde(default = "...")]`).
 ///
-/// Set this macro on a struct where you use [`Serialize`] or [`Deserialize`] and use `#[serde_inline_default(...)]` on the field you want to have a inline default value.
-/// Replace the `...` with the value you want and it will be set as default if serde needs it.
+/// Set this macro on a struct where you use [`Serialize`] or [`Deserialize`] and use
+/// `#[serde_inline_default(...)]` on the field you want to have an inline default value.
+/// Replace the `...` with the value you want, and it will be set as default if serde needs it.
 ///
-/// Note that you must set this macro _before_ `#[derive(Serialize)]` / `#[derive(Deserialize)]` as it wouldn't work properly if set after the derive.
+/// Note that you must set this macro _before_ `#[derive(Serialize)]` / `#[derive(Deserialize)]` as
+/// it won't work properly if it's set after the derive.
 ///
 /// # Examples
 ///
