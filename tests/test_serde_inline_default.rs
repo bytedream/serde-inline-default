@@ -43,3 +43,26 @@ fn test_lifetime() {
 
     assert_eq!(lifetime_test.test_str, "test");
 }
+
+#[test]
+#[allow(dead_code)]
+fn test_conditional_compilation() {
+    #[cfg(debug_assertions)]
+    #[derive(Deserialize)]
+    struct TypeA(u8);
+
+    #[cfg(not(debug_assertions))]
+    #[derive(Deserialize)]
+    struct TypeB(u8);
+
+    #[serde_inline_default]
+    #[derive(Deserialize)]
+    struct Test {
+        #[cfg(debug_assertions)]
+        #[serde_inline_default(TypeA(1))]
+        val_a: TypeA,
+        #[cfg(not(debug_assertions))]
+        #[serde_inline_default(TypeB(1))]
+        val_b: TypeB,
+    }
+}
