@@ -1,10 +1,11 @@
+use std::borrow::Cow;
+
 use serde::Deserialize;
 use serde_inline_default::serde_inline_default;
 use serde_json::json;
-use std::borrow::Cow;
 
 #[test]
-fn test_serde_inline_default() {
+fn struct_normal() {
     fn native_default() -> u32 {
         69
     }
@@ -31,7 +32,7 @@ fn test_serde_inline_default() {
 }
 
 #[test]
-fn test_lifetime() {
+fn lifetime() {
     #[serde_inline_default]
     #[derive(Deserialize)]
     struct LifetimeTest<'a> {
@@ -46,7 +47,7 @@ fn test_lifetime() {
 
 #[test]
 #[allow(dead_code)]
-fn test_conditional_compilation() {
+fn conditional_compilation() {
     #[cfg(debug_assertions)]
     #[derive(Deserialize)]
     struct TypeA(u8);

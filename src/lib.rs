@@ -37,6 +37,7 @@ pub fn serde_inline_default(_attr: TokenStream, input: TokenStream) -> TokenStre
 
     match item {
         Item::Struct(s) => expand::expand_struct(s),
-        _ => panic!("can only be used on structs"),
+        Item::Enum(e) => expand::expand_enum(e),
+        _ => panic!("can only be used on structs and enums"),
     }
 }

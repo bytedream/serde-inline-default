@@ -1,55 +1,70 @@
-use crate::utils::type_lifetimes_to_static;
-use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
-use syn::{parse_quote, ItemStruct};
+use syn::{spanned::Spanned, Error, Fields, ItemEnum, ItemStruct};
+
+use crate::utils::{check_field_for_default_expr, ATTR_NAME, DEFAULT_FN_PREFIX};
 
 pub(crate) fn expand_struct(mut item: ItemStruct) -> proc_macro::TokenStream {
-    let mut inline_fns: Vec<TokenStream> = vec![];
+    let mut default_fns = vec![];
 
     for (i, field) in item.fields.iter_mut().enumerate() {
-        for (j, attr) in field.attrs.iter_mut().enumerate() {
-            if !attr.path().is_ident("serde_inline_default") {
-                continue;
+        default_fns.extend(check_field_for_default_expr(field, || {
+            format!("{}_{}_Field{}", DEFAULT_FN_PREFIX, item.ident, i)
+        }));
+    }
+
+    quote! {
+        #( #default_fns )*
+
+        #item
+    }
+    .into()
+}
+
+pub(crate) fn expand_enum(mut item: ItemEnum) -> proc_macro::TokenStream {
+    let mut default_fns = vec![];
+
+    for (i, variant) in item.variants.iter_mut().enumerate() {
+        if variant.attrs.iter().any(|a| a.path().is_ident(ATTR_NAME)) {
+            return Error::new(
+                variant.span(),
+                format!(
+                    "#[{}] can only be used on named enum variant fields",
+                    ATTR_NAME
+                ),
+            )
+            .to_compile_error()
+            .into();
+        }
+
+        let fields = match &mut variant.fields {
+            Fields::Named(fields) => fields,
+            _ => {
+                return Error::new(
+                    variant.span(),
+                    format!(
+                        "#[{}] can only be used on named enum variant fields",
+                        ATTR_NAME
+                    ),
+                )
+                .to_compile_error()
+                .into()
             }
+        };
 
-            let default: TokenStream = attr.parse_args().unwrap();
-
-            // copy all the same #[cfg] conditional compilations flags for the field onto our built
-            // default function.
-            // otherwise, it's possible to create a constructor for a type that may be filtered by
-            // the same #[cfg]'s, breaking compilation
-            let cfg_attrs = field.attrs.iter().filter(|a| a.path().is_ident("cfg"));
-
-            let fn_name_lit = format!("__serde_inline_default_{}_{}", item.ident, i);
-            let fn_name_ident = Ident::new(&fn_name_lit, Span::call_site());
-            let mut return_type = field.ty.clone();
-
-            // replace lifetimes with 'static.
-            // the built default function / default values in general can only be static as they're
-            // generated without reference to the parent struct
-            type_lifetimes_to_static(&mut return_type);
-
-            inline_fns.push(quote! {
-                #[doc(hidden)]
-                #[allow(non_snake_case)]
-                #( #cfg_attrs )*
-                fn #fn_name_ident () -> #return_type {
-                    #default
-                }
-            });
-
-            field.attrs.remove(j);
-            field
-                .attrs
-                .insert(j, parse_quote!( #[serde(default = #fn_name_lit)] ));
-            break;
+        for (j, field) in fields.named.iter_mut().enumerate() {
+            default_fns.extend(check_field_for_default_expr(field, || {
+                format!(
+                    "{}_{}_Variant{}_Field{}",
+                    DEFAULT_FN_PREFIX, item.ident, i, j
+                )
+            }));
         }
     }
 
-    let expanded = quote! {
-        #( #inline_fns )*
+    quote! {
+        #( #default_fns )*
 
         #item
-    };
-    expanded.into()
+    }
+    .into()
 }
