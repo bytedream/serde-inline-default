@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 use proc_macro::TokenStream;
-use syn::{parse_macro_input, Item};
+use syn::{parse_macro_input, spanned::Spanned, Error, Item};
 
 mod expand;
 mod utils;
@@ -32,12 +32,17 @@ mod utils;
 /// [`Serialize`]: https://docs.rs/serde/*/serde/trait.Serialize.html
 /// [`Deserialize`]: https://docs.rs/serde/*/serde/trait.Deserialize.html
 #[proc_macro_attribute]
-pub fn serde_inline_default(_attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn serde_inline_default(attr: TokenStream, input: TokenStream) -> TokenStream {
     let item = parse_macro_input!(input as Item);
 
     match item {
         Item::Struct(s) => expand::expand_struct(s),
         Item::Enum(e) => expand::expand_enum(e),
-        _ => panic!("can only be used on structs and enums"),
+        _ => Error::new(
+            proc_macro2::TokenStream::from(attr).span(),
+            "can only be used on structs and enums",
+        )
+        .to_compile_error()
+        .into(),
     }
 }
