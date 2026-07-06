@@ -9,6 +9,14 @@ repository = "https://github.com/bytedream/serde-inline-default"
 license = "MIT OR Apache-2.0"
 keywords = ["serde", "serialization"]
 categories = ["encoding"]
+include = [
+    "/Cargo.toml",
+    "/LICENSE-APACHE",
+    "/LICENSE-MIT",
+    "/README.md",
+    "/src/**",
+    "/tests/**"
+]
 
 [lib]
 proc-macro = true
