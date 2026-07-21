@@ -26,7 +26,7 @@ pub(crate) fn type_lifetimes_to_static(ty: &mut Type) {
                     }
                     PathArguments::Parenthesized(parenthesized) => {
                         for input in &mut parenthesized.inputs {
-                            type_lifetimes_to_static(input)
+                            type_lifetimes_to_static(&mut input.ty)
                         }
                     }
                 }
