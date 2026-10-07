@@ -73,6 +73,7 @@ pub(crate) fn check_field_for_default_expr(
         let default_fn_expr = quote! {
             #[doc(hidden)]
             #[allow(non_snake_case)]
+            #[inline]
             #( #cfg_attrs )*
             fn #default_fn_ident () -> #return_type {
                 #default_expr
